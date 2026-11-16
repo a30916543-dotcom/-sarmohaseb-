@@ -22,18 +22,21 @@ jobs:
             git zip unzip \
             openjdk-17-jdk \
             python3-pip \
+            python3-venv \
             autoconf automake libtool \
             pkg-config zlib1g-dev \
-            libffi-dev libssl-dev \
-            cmake
+            libffi-dev libssl-dev cmake
 
-      - name: Install Buildozer
+      - name: Create Python environment
         run: |
-          python3 -m pip install --user --break-system-packages buildozer cython==0.29.36
+          python3 -m venv .venv
+          . .venv/bin/activate
+          pip install --upgrade pip setuptools wheel
+          pip install buildozer cython==0.29.36
 
       - name: Build APK
         run: |
-          export PATH=$PATH:$HOME/.local/bin
+          . .venv/bin/activate
           buildozer android debug
 
       - name: Upload APK
@@ -42,3 +45,4 @@ jobs:
           name: Sarmohaseb-APK
           path: bin/*.apk
           if-no-files-found: error
+
