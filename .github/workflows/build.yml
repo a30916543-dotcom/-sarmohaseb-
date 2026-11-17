@@ -39,6 +39,7 @@ jobs:
 
       - name: Install Android packages
         run: |
+          sdkmanager --licenses
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Setup Python
@@ -48,17 +49,26 @@ jobs:
           pip install --upgrade pip setuptools wheel
           pip install buildozer cython==0.29.36
 
-      - name: Build APK
+      - name: Build APK and show errors
         run: |
           . .venv/bin/activate
-          buildozer android debug
+          set +e
+          buildozer -v android debug > build.log 2>&1
+          RESULT=$?
+          echo "===== ERROR LINES ====="
+          grep -inE "error:|exception|failed|fatal" build.log | tail -40 || true
+          echo "===== LAST 120 LINES ====="
+          tail -120 build.log
+          exit $RESULT
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: Sarmohaseb-APK
           path: bin/*.apk
           if-no-files-found: error
+
 
 
 
