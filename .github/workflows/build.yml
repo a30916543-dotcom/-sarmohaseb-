@@ -35,7 +35,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: platform-tools,platforms;android-35,build-tools;35.0.0
+          packages: ''
+
+      - name: Install Android packages
+        run: |
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Setup Python
         run: |
@@ -55,6 +59,7 @@ jobs:
           name: Sarmohaseb-APK
           path: bin/*.apk
           if-no-files-found: error
+
 
 
 
